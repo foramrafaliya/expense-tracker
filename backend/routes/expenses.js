@@ -5,6 +5,7 @@ const router = express.Router();
 let expenses = [
   { id: 1, title: "Groceries", amount: 450, category: "Food" },
   { id: 2, title: "Bus Pass", amount: 120, category: "Travel" },
+  { id: 3, title: "Bus Pass", amount: 120, category: "Travel" },
 ];
 let nextId = 3;
 
