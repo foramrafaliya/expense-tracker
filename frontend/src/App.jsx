@@ -72,7 +72,6 @@ function App() {
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option>Food</option>
           <option>Travel</option>
-          <option>Shopping</option>
           <option>Bills</option>
           <option>Other</option>
         </select>
