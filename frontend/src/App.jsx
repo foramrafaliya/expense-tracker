@@ -52,7 +52,7 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>💰 Expense Tracker 1</h1>
+        <h1>💰 Expense Tracker 2</h1>
         <span className="version-badge">Backend: {version}</span>
       </header>
 
