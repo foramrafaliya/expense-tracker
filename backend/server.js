@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Health check endpoint - useful for Uptime Kuma / CI-CD smoke tests
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", version: process.env.APP_VERSION || "v1" });
+  res.json({ status: "broken", version: process.env.APP_VERSION || "v1" });
 });
 
 app.use("/api/expenses", expensesRouter);
