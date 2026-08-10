@@ -1,3 +1,4 @@
+console.log("Expense Tracker v2 - improved logging");
 const express = require("express");
 const cors = require("cors");
 const expensesRouter = require("./routes/expenses");
