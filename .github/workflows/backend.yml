@@ -1,10 +1,10 @@
 name: Backend CI/CD
 
-# This workflow triggers ONLY when files inside the backend/ folder change.
-# If frontend/ files change, this workflow will NOT run.
 on:
   push:
     branches: [main]
+    tags:
+      - "v*"
     paths:
       - "backend/**"
       - ".github/workflows/backend.yml"
@@ -26,11 +26,18 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Run basic sanity check
-        working-directory: ./backend
-        run: node -e "require('./server.js')" & sleep 2 && curl -f http://localhost:5000/health && kill %1
+      - name: Determine version tag
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Deploy to EC2
+      # Ye step ab deploy-backend.sh ko call karta hai - jisme
+      # version switch + health check + automatic rollback sab already likha hai
+      - name: Deploy to EC2 (with automatic rollback on failure)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -38,11 +45,13 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-            cd /home/ubuntu/expense-tracker
-            git pull origin main
-            cd backend
-            npm ci
-            sudo systemctl restart expense-backend
-            sleep 2
-            curl -f http://localhost:5000/health || (echo "Health check failed" && exit 1)
-            echo "Backend deployed successfully"
+            bash /home/ubuntu/deploy-scripts/deploy-backend.sh ${{ steps.version.outputs.VERSION }}
+
+      - name: Report deployment result
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment of ${{ steps.version.outputs.VERSION }} succeeded and is live."
+          else
+            echo "❌ Deployment of ${{ steps.version.outputs.VERSION }} failed health check. Auto-rollback was attempted on the server."
+          fi
