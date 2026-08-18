@@ -54,4 +54,8 @@ jobs:
             echo "✅ Deployment of ${{ steps.version.outputs.VERSION }} succeeded and is live."
           else
             echo "❌ Deployment of ${{ steps.version.outputs.VERSION }} failed health check. Auto-rollback was attempted on the server."
+<<<<<<< HEAD
           fi
+=======
+          fi
+>>>>>>> refs/remotes/origin/main
